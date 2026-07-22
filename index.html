@@ -1,0 +1,2018 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Study Agent | AI-Powered Learning Hub</title>
+  <meta name="description" content="A comprehensive, AI-powered Smart Study Agent designed to supercharge student learning with AI chat, instant summaries, 3D flashcards, interactive quizzes, document analysis, and custom study plans.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ==========================================================================
+       CSS VARIABLES & THEME DEFINITIONS
+       ========================================================================== */
+    :root {
+      /* Brand Palette */
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --primary-light: rgba(99, 102, 241, 0.15);
+      --secondary: #8b5cf6;
+      --accent: #06b6d4;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+
+      /* Dark Theme (Default) */
+      --bg-main: #0b0f19;
+      --bg-surface: #111827;
+      --bg-card: #1e293b;
+      --bg-card-hover: #2d3748;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-inverse: #0f172a;
+
+      /* Glassmorphism & Shadow Effects */
+      --glass-bg: rgba(17, 24, 39, 0.75);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+      --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.35);
+      --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
+      --glow-primary: 0 0 20px rgba(99, 102, 241, 0.35);
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+
+      --transition-fast: 0.2s ease;
+      --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="light"] {
+      --bg-main: #f1f5f9;
+      --bg-surface: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f8fafc;
+      --border-color: rgba(0, 0, 0, 0.08);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-inverse: #ffffff;
+
+      --glass-bg: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(0, 0, 0, 0.08);
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+      --glow-primary: 0 0 20px rgba(99, 102, 241, 0.2);
+    }
+
+    /* ==========================================================================
+       RESET & BASE STYLES
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background-color var(--transition-normal), color var(--transition-normal);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-main);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--bg-card-hover);
+      border-radius: var(--radius-full);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
+    }
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: inherit;
+    }
+
+    /* ==========================================================================
+       APP CONTAINER & LAYOUT
+       ========================================================================== */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      box-shadow: var(--glow-primary);
+    }
+
+    .brand-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      padding: 0.15rem 0.5rem;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Stats Bar */
+    .header-stats {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      background: var(--bg-surface);
+      padding: 0.4rem 1rem;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-color);
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      color: var(--primary);
+    }
+
+    /* Subject Quick Switcher */
+    .subject-select-wrapper {
+      position: relative;
+    }
+
+    .subject-select {
+      appearance: none;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.5rem 2.2rem 0.5rem 0.85rem;
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      transition: var(--transition-fast);
+    }
+
+    .subject-select:hover {
+      border-color: var(--primary);
+    }
+
+    .subject-select-arrow {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      fill: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .theme-toggle-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-main);
+      transition: var(--transition-fast);
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--bg-card-hover);
+      color: var(--primary);
+    }
+
+    /* Main Container Layout */
+    .app-container {
+      display: flex;
+      flex: 1;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-color);
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      transition: var(--transition-normal);
+    }
+
+    .nav-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: 0.5rem 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: var(--transition-fast);
+      position: relative;
+    }
+
+    .nav-item:hover {
+      background: var(--bg-card-hover);
+      color: var(--text-main);
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #ffffff;
+      box-shadow: var(--glow-primary);
+    }
+
+    .nav-item-badge {
+      margin-left: auto;
+      font-size: 0.7rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: var(--radius-full);
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .nav-item.active .nav-item-badge {
+      background: rgba(255, 255, 255, 0.25);
+      color: #fff;
+    }
+
+    /* Main Content Area */
+    .main-content {
+      flex: 1;
+      padding: 1.75rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+
+    /* Views Switcher */
+    .view-pane {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out forwards;
+    }
+
+    .view-pane.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Banner / Hero Card */
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-banner::after {
+      content: '';
+      position: absolute;
+      right: -30px;
+      bottom: -30px;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+      opacity: 0.2;
+      pointer-events: none;
+    }
+
+    .hero-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+
+    .hero-subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.25rem;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: var(--transition-fast);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary:hover {
+      box-shadow: var(--glow-primary);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--primary);
+    }
+
+    /* ==========================================================================
+       SECTION 1: AI CHAT ASSISTANT (WATSON ORCHESTRATE CONTAINER)
+       ========================================================================== */
+    .chat-layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 1.5rem;
+      min-height: 620px;
+    }
+
+    .chat-container-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+
+    .chat-card-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--glass-bg);
+    }
+
+    .chat-agent-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .agent-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .agent-status {
+      font-size: 0.75rem;
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--success);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--success);
+    }
+
+    /* Watson Orchestrate Root Embed Element */
+    #root {
+      flex: 1;
+      width: 100%;
+      min-height: 500px;
+      background: var(--bg-surface);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Loading / Fallback Banner inside #root if Watson is initializing */
+    .watson-loader-fallback {
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 1.25rem;
+    }
+
+    .pulse-loader {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+      50% { transform: scale(1.05); opacity: 1; box-shadow: 0 0 0 15px rgba(99, 102, 241, 0); }
+      100% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+    }
+
+    /* Sidebar Quick Prompts */
+    .prompts-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .sidebar-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+    }
+
+    .sidebar-card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .prompt-chip {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.65rem 0.85rem;
+      font-size: 0.83rem;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: var(--transition-fast);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .prompt-chip:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateX(3px);
+    }
+
+    /* ==========================================================================
+       SECTION 2: SUBJECT HUB & DASHBOARD
+       ========================================================================== */
+    .grid-subjects {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .subject-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.35rem;
+      transition: var(--transition-normal);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .subject-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+
+    .subject-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .subject-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .subject-meta {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: var(--bg-main);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      transition: width 0.6s ease;
+    }
+
+    .progress-text {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       SECTION 3: FILE & NOTES ANALYZER
+       ========================================================================== */
+    .upload-dropzone {
+      border: 2px dashed var(--primary);
+      background: var(--primary-light);
+      border-radius: var(--radius-lg);
+      padding: 3rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition-normal);
+      margin-bottom: 1.5rem;
+    }
+
+    .upload-dropzone:hover {
+      background: rgba(99, 102, 241, 0.25);
+      border-color: var(--secondary);
+    }
+
+    .upload-icon {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 1rem;
+      color: var(--primary);
+    }
+
+    .analysis-result-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .tag-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    /* ==========================================================================
+       SECTION 4: AI SUMMARIES & MIND MAPS
+       ========================================================================== */
+    .summary-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .tab-group {
+      display: flex;
+      background: var(--bg-surface);
+      padding: 0.3rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+    }
+
+    .tab-btn {
+      padding: 0.45rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: var(--transition-fast);
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .summary-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .summary-bullet-list {
+      margin-left: 1.25rem;
+      margin-top: 0.85rem;
+    }
+
+    .summary-bullet-list li {
+      margin-bottom: 0.65rem;
+      color: var(--text-main);
+      line-height: 1.7;
+    }
+
+    /* Audio Player Component */
+    .audio-player-card {
+      background: linear-gradient(135deg, var(--bg-surface), var(--bg-card));
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+
+    .play-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--glow-primary);
+    }
+
+    .waveform-visualizer {
+      flex: 1;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .wave-bar {
+      flex: 1;
+      height: 100%;
+      background: var(--primary-light);
+      border-radius: 2px;
+      animation: wave 1.2s infinite ease-in-out alternate;
+    }
+
+    .wave-bar:nth-child(2n) { animation-delay: 0.2s; }
+    .wave-bar:nth-child(3n) { animation-delay: 0.4s; }
+    .wave-bar:nth-child(4n) { animation-delay: 0.6s; }
+
+    @keyframes wave {
+      0% { height: 20%; background: var(--primary-light); }
+      100% { height: 100%; background: var(--primary); }
+    }
+
+    .audio-playing .wave-bar {
+      animation-play-state: running;
+    }
+
+    .audio-paused .wave-bar {
+      animation-play-state: paused;
+    }
+
+    /* Visual Mind Map Container */
+    .mindmap-container {
+      width: 100%;
+      height: 400px;
+      background: var(--bg-main);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ==========================================================================
+       SECTION 5: INTERACTIVE 3D FLASHCARDS
+       ========================================================================== */
+    .flashcard-wrapper {
+      max-width: 600px;
+      margin: 0 auto;
+      perspective: 1000px;
+    }
+
+    .flashcard {
+      width: 100%;
+      height: 340px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+
+    .flashcard.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      box-shadow: var(--shadow-md);
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .card-face-back {
+      transform: rotateY(180deg);
+      background: linear-gradient(135deg, var(--bg-surface), var(--bg-card));
+      border-color: var(--primary);
+    }
+
+    .card-category-tag {
+      position: absolute;
+      top: 1.25rem;
+      left: 1.25rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--primary);
+      background: var(--primary-light);
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+    }
+
+    .card-prompt-hint {
+      position: absolute;
+      bottom: 1.25rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .flashcard-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1.75rem;
+    }
+
+    /* ==========================================================================
+       SECTION 6: SMART QUIZ ARENA
+       ========================================================================== */
+    .quiz-container {
+      max-width: 720px;
+      margin: 0 auto;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+    }
+
+    .quiz-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .quiz-timer {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--warning);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(245, 158, 11, 0.1);
+      padding: 0.3rem 0.75rem;
+      border-radius: var(--radius-full);
+    }
+
+    .quiz-options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      margin: 1.5rem 0;
+    }
+
+    .quiz-option {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .quiz-option:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .quiz-option.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .quiz-option.correct {
+      border-color: var(--success);
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+    }
+
+    .quiz-option.incorrect {
+      border-color: var(--danger);
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+    }
+
+    .option-prefix {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .explanation-box {
+      background: rgba(99, 102, 241, 0.1);
+      border-left: 4px solid var(--primary);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 1rem 1.25rem;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    /* ==========================================================================
+       SECTION 7: STUDY PLANNER & POMODORO TIMER
+       ========================================================================== */
+    .planner-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 1.5rem;
+    }
+
+    .schedule-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .schedule-day {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 0.5rem;
+      min-height: 180px;
+    }
+
+    .day-header {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      text-align: center;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .event-chip {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.35rem 0.4rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 0.35rem;
+      color: #fff;
+    }
+
+    /* Pomodoro Card */
+    .pomodoro-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+    }
+
+    .timer-display {
+      font-family: 'Outfit', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin: 1.25rem 0;
+      color: var(--text-main);
+    }
+
+    .task-checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      margin-top: 1rem;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: var(--bg-card);
+      padding: 0.65rem 0.85rem;
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+    }
+
+    .task-item.completed {
+      text-decoration: line-through;
+      color: var(--text-muted);
+      opacity: 0.7;
+    }
+
+    /* ==========================================================================
+       RESPONSIVE DESIGN (MEDIA QUERIES)
+       ========================================================================== */
+    @media (max-width: 1024px) {
+      .chat-layout, .planner-layout {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        width: 220px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .app-container {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 0.75rem;
+      }
+      .nav-label {
+        display: none;
+      }
+      .nav-item {
+        white-space: nowrap;
+      }
+      .schedule-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .header-stats {
+        display: none;
+      }
+    }
+  </style>
+
+  <!-- ==========================================================================
+       WATSON ORCHESTRATE EMBED SCRIPT (EXACT UNMODIFIED CONFIGURATION)
+       ========================================================================== -->
+  <script>
+    window.wxOConfiguration = {
+      orchestrationID: "3582bef3a6ae4e45a54a497fb0876430_0ef07428-a752-4eb6-aab9-c412ce9d7bb9",
+      hostURL: "https://au-syd.watson-orchestrate.cloud.ibm.com",
+      rootElementID: "root",
+      deploymentPlatform: "ibmcloud",
+      crn: "crn:v1:bluemix:public:watsonx-orchestrate:au-syd:a/3582bef3a6ae4e45a54a497fb0876430:0ef07428-a752-4eb6-aab9-c412ce9d7bb9::",
+      chatOptions: {
+          agentId: "ecf26676-d0e3-4f41-aee6-ec349cc07173", 
+      }
+    };
+    setTimeout(function () {
+      const script = document.createElement('script');
+      script.src = `${window.wxOConfiguration.hostURL}/wxochat/wxoLoader.js?embed=true`;
+      script.addEventListener('load', function () {
+          wxoLoader.init();
+      });
+      document.head.appendChild(script);
+    }, 0);                     
+  </script>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       HEADER & NAVIGATION BAR
+       ========================================================================== -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <span>SmartStudy</span>
+      <span class="brand-badge">AI Agent</span>
+    </div>
+
+    <!-- Gamification & Subject Selector -->
+    <div class="header-stats">
+      <div class="stat-item" title="Study Streak">
+        <span>🔥</span>
+        <span class="stat-value">7 Day Streak</span>
+      </div>
+      <div class="stat-item" title="Earned XP">
+        <span>⭐</span>
+        <span class="stat-value" id="xp-counter">2,450 XP</span>
+      </div>
+      <div class="stat-item" title="Weekly Target">
+        <span>⏱️</span>
+        <span class="stat-value">14.5 / 20 hrs</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Active Subject Filter -->
+      <div class="subject-select-wrapper">
+        <select class="subject-select" id="active-subject-select" onchange="onSubjectChange(this.value)">
+          <option value="Physics">⚛️ Physics</option>
+          <option value="Computer Science">💻 Computer Science</option>
+          <option value="Biology">🧬 Biology</option>
+          <option value="Mathematics">📐 Mathematics</option>
+          <option value="World History">📜 World History</option>
+          <option value="Chemistry">🧪 Chemistry</option>
+        </select>
+        <svg class="subject-select-arrow" width="14" height="14" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+      </div>
+
+      <!-- Theme Switcher -->
+      <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Light/Dark Theme" id="theme-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       MAIN APP CONTAINER
+       ========================================================================== -->
+  <div class="app-container">
+
+    <!-- SIDEBAR NAV -->
+    <aside class="sidebar">
+      <div class="nav-label">Study Modules</div>
+      
+      <a href="#chat" class="nav-item active" onclick="switchTab('chat', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>AI Assistant</span>
+        <span class="nav-item-badge">Live</span>
+      </a>
+
+      <a href="#subjects" class="nav-item" onclick="switchTab('subjects', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span>Subject Hub</span>
+      </a>
+
+      <a href="#analyzer" class="nav-item" onclick="switchTab('analyzer', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>Notes & Files</span>
+      </a>
+
+      <a href="#summaries" class="nav-item" onclick="switchTab('summaries', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polygon points="12 18 8 14 16 14"/></svg>
+        <span>AI Summaries</span>
+      </a>
+
+      <a href="#flashcards" class="nav-item" onclick="switchTab('flashcards', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        <span>3D Flashcards</span>
+      </a>
+
+      <a href="#quiz" class="nav-item" onclick="switchTab('quiz', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>Smart Quiz</span>
+      </a>
+
+      <a href="#planner" class="nav-item" onclick="switchTab('planner', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Planner & Timer</span>
+      </a>
+    </aside>
+
+    <!-- MAIN CONTENT VIEW PANES -->
+    <main class="main-content">
+
+      <!-- ==========================================================================
+           TAB 1: AI CHAT ASSISTANT
+           ========================================================================== -->
+      <section id="chat-view" class="view-pane active">
+        <div class="hero-banner">
+          <div>
+            <h1 class="hero-title">Watson AI Study Assistant 💬</h1>
+            <p class="hero-subtitle">Ask any question, resolve complex math equations, or request instant summaries for your current subject.</p>
+          </div>
+          <button class="btn btn-primary" onclick="insertPrompt('Explain Quantum Mechanics in simple terms')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Quick Ask
+          </button>
+        </div>
+
+        <div class="chat-layout">
+          <!-- Chat Card Container housing IBM Watson root element -->
+          <div class="chat-container-card">
+            <div class="chat-card-header">
+              <div class="chat-agent-info">
+                <div class="agent-avatar">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/></svg>
+                </div>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.95rem;">Watson Orchestrate Agent</div>
+                  <div class="agent-status"><span class="status-dot"></span> Active & Connected</div>
+                </div>
+              </div>
+              <button class="btn btn-secondary" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" onclick="clearChat()">Clear Chat</button>
+            </div>
+
+            <!-- MANDATORY WATSON ORCHESTRATE CONTAINER ELEMENT -->
+            <div id="root">
+              <div class="watson-loader-fallback" id="watson-fallback">
+                <div class="pulse-loader"></div>
+                <h3 style="font-size: 1.1rem; font-weight: 700;">Initializing IBM Watson Orchestrate AI...</h3>
+                <p style="color: var(--text-muted); font-size: 0.88rem; max-width: 400px;">The AI study widget is loading via Watson Orchestrate CDN. You can also pick a prompt on the right to start.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prompts & Subject Context Sidebar -->
+          <div class="prompts-sidebar">
+            <div class="sidebar-card">
+              <div class="sidebar-card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                Suggested AI Prompts
+              </div>
+              <div class="prompt-chip" onclick="insertPrompt('Explain Quantum Physics in 3 bullet points')">
+                <span>⚛️ Explain Quantum Physics</span>
+                <span>→</span>
+              </div>
+              <div class="prompt-chip" onclick="insertPrompt('Generate 5 quiz questions on Data Structures')">
+                <span>💻 Quiz on Data Structures</span>
+                <span>→</span>
+              </div>
+              <div class="prompt-chip" onclick="insertPrompt('Summarize the key causes of World War 1')">
+                <span>📜 Causes of World War 1</span>
+                <span>→</span>
+              </div>
+              <div class="prompt-chip" onclick="insertPrompt('How does ATP synthesis work in Biology?')">
+                <span>🧬 Explain ATP Synthesis</span>
+                <span>→</span>
+              </div>
+              <div class="prompt-chip" onclick="insertPrompt('Help me write a Python script for sorting')">
+                <span>🐍 Write Sorting Algorithm</span>
+                <span>→</span>
+              </div>
+            </div>
+
+            <div class="sidebar-card" style="background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.1));">
+              <div class="sidebar-card-title">💡 Study Tip of the Day</div>
+              <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">
+                <strong>Feynman Technique:</strong> To test your understanding of a complex topic, try explaining it to the AI assistant as if you were teaching a 10-year-old!
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           TAB 2: SUBJECT HUB
+           ========================================================================== -->
+      <section id="subjects-view" class="view-pane">
+        <div class="hero-banner">
+          <div>
+            <h1 class="hero-title">Subject Hub & Progress 📚</h1>
+            <p class="hero-subtitle">Track your mastery level, review recent topics, and jump into focused study sessions.</p>
+          </div>
+        </div>
+
+        <div class="grid-subjects" id="subjects-grid">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           TAB 3: NOTES & FILE ANALYZER
+           ========================================================================== -->
+      <section id="analyzer-view" class="view-pane">
+        <div class="hero-banner">
+          <div>
+            <h1 class="hero-title">AI Notes & File Analyzer 📁</h1>
+            <p class="hero-subtitle">Upload your lecture notes, PDFs, or textbook slides to extract key concepts, generate summaries, and build quiz cards instantly.</p>
+          </div>
+        </div>
+
+        <div class="upload-dropzone" onclick="document.getElementById('file-input').click()" ondragover="event.preventDefault()" ondrop="handleFileDrop(event)">
+          <input type="file" id="file-input" style="display: none;" onchange="handleFileSelect(event)" accept=".pdf,.docx,.txt,image/*">
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.35rem;">Drop your lecture notes or PDF here</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">Supports PDF, DOCX, TXT, or Image files (Max 25MB)</p>
+          <button class="btn btn-primary" style="margin-top: 1rem;">Browse File</button>
+        </div>
+
+        <div class="analysis-result-card" id="analysis-result">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <span style="font-size: 1.5rem;">📄</span>
+              <div>
+                <h3 id="analyzed-filename" style="font-size: 1.05rem; font-weight: 700;">Quantum_Mechanics_Ch4.pdf</h3>
+                <span style="font-size: 0.78rem; color: var(--success); font-weight: 600;">✓ AI Analysis Complete</span>
+              </div>
+            </div>
+            <button class="btn btn-primary" style="padding: 0.4rem 0.85rem; font-size: 0.8rem;" onclick="switchTab('summaries')">View AI Summary</button>
+          </div>
+
+          <h4 style="font-size: 0.9rem; font-weight: 700; margin-top: 1rem; color: var(--text-muted);">Extracted Key Topics & Vocabulary</h4>
+          <div class="tag-cloud" id="analyzed-tags">
+            <span class="tag-item">Wave Function</span>
+            <span class="tag-item">Schrödinger Equation</span>
+            <span class="tag-item">Heisenberg Uncertainty</span>
+            <span class="tag-item">Quantum Superposition</span>
+            <span class="tag-item">Probability Density</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           TAB 4: AI SUMMARIES & MIND MAPS
+           ========================================================================== -->
+      <section id="summaries-view" class="view-pane">
+        <div class="summary-toolbar">
+          <div>
+            <h2 style="font-size: 1.4rem; font-weight: 700;" id="summary-subject-title">Physics - Unit 3: Quantum Physics</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">AI-generated synthesis from your uploaded notes & textbooks.</p>
+          </div>
+
+          <div class="tab-group">
+            <button class="tab-btn active" onclick="switchSummaryView('bullets', this)">Bullet Points</button>
+            <button class="tab-btn" onclick="switchSummaryView('mindmap', this)">Visual Mind Map</button>
+            <button class="tab-btn" onclick="switchSummaryView('audio', this)">Audio Reader</button>
+          </div>
+        </div>
+
+        <!-- View Pane 1: Bullets -->
+        <div id="summary-bullets-content" class="summary-card">
+          <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--primary);">Core Takeaways & Concepts</h3>
+          <ul class="summary-bullet-list">
+            <li><strong>Wave-Particle Duality:</strong> Light and matter exhibit both wave-like and particle-like properties depending on how they are measured (e.g., Double-Slit Experiment).</li>
+            <li><strong>Schrödinger's Wave Equation:</strong> Describes how the quantum state of a physical system changes over time using probability amplitudes.</li>
+            <li><strong>Heisenberg Uncertainty Principle:</strong> It is fundamentally impossible to simultaneously determine both the precise position and momentum of a subatomic particle.</li>
+            <li><strong>Quantum Superposition:</strong> A system remains in all possible state combinations until an observation collapses the wave function into a single state.</li>
+          </ul>
+
+          <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
+            <button class="btn btn-secondary" onclick="copySummaryText()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy Summary
+            </button>
+            <button class="btn btn-primary" onclick="switchTab('quiz')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              Generate Quiz from Summary
+            </button>
+          </div>
+        </div>
+
+        <!-- View Pane 2: Mind Map SVG -->
+        <div id="summary-mindmap-content" class="mindmap-container" style="display: none;">
+          <svg width="100%" height="100%" viewBox="0 0 800 380" xmlns="http://www.w3.org/2000/svg">
+            <!-- Center Node -->
+            <g transform="translate(400, 190)">
+              <rect x="-90" y="-25" width="180" height="50" rx="25" fill="var(--primary)" filter="drop-shadow(0 4px 12px rgba(99,102,241,0.4))"/>
+              <text x="0" y="5" text-anchor="middle" fill="#fff" font-weight="700" font-size="14">Quantum Physics</text>
+            </g>
+
+            <!-- Branch 1: Superposition -->
+            <path d="M 310 190 Q 200 120 160 90" stroke="var(--primary)" stroke-width="2.5" fill="none" stroke-dasharray="4 2"/>
+            <g transform="translate(160, 90)">
+              <rect x="-75" y="-20" width="150" height="40" rx="10" fill="var(--bg-surface)" stroke="var(--secondary)" stroke-width="2"/>
+              <text x="0" y="4" text-anchor="middle" fill="var(--text-main)" font-weight="600" font-size="12">Superposition</text>
+            </g>
+
+            <!-- Branch 2: Entanglement -->
+            <path d="M 490 190 Q 600 120 640 90" stroke="var(--primary)" stroke-width="2.5" fill="none"/>
+            <g transform="translate(640, 90)">
+              <rect x="-75" y="-20" width="150" height="40" rx="10" fill="var(--bg-surface)" stroke="var(--accent)" stroke-width="2"/>
+              <text x="0" y="4" text-anchor="middle" fill="var(--text-main)" font-weight="600" font-size="12">Entanglement</text>
+            </g>
+
+            <!-- Branch 3: Uncertainty -->
+            <path d="M 310 190 Q 200 260 160 290" stroke="var(--primary)" stroke-width="2.5" fill="none"/>
+            <g transform="translate(160, 290)">
+              <rect x="-75" y="-20" width="150" height="40" rx="10" fill="var(--bg-surface)" stroke="var(--success)" stroke-width="2"/>
+              <text x="0" y="4" text-anchor="middle" fill="var(--text-main)" font-weight="600" font-size="12">Uncertainty Principle</text>
+            </g>
+
+            <!-- Branch 4: Wave Function -->
+            <path d="M 490 190 Q 600 260 640 290" stroke="var(--primary)" stroke-width="2.5" fill="none"/>
+            <g transform="translate(640, 290)">
+              <rect x="-75" y="-20" width="150" height="40" rx="10" fill="var(--bg-surface)" stroke="var(--warning)" stroke-width="2"/>
+              <text x="0" y="4" text-anchor="middle" fill="var(--text-main)" font-weight="600" font-size="12">Wave Function Ψ</text>
+            </g>
+          </svg>
+        </div>
+
+        <!-- View Pane 3: Audio Reader -->
+        <div id="summary-audio-content" style="display: none;">
+          <div class="audio-player-card" id="audio-player-widget">
+            <button class="play-btn" onclick="toggleAudioReader()">
+              <svg id="play-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </button>
+            <div style="flex: 1;">
+              <div style="font-weight: 700; font-size: 0.92rem;">AI Voice Summary Reader</div>
+              <div style="font-size: 0.78rem; color: var(--text-muted);" id="audio-status">Click play to listen to 2-minute summary</div>
+              <div class="waveform-visualizer audio-paused" id="waveform">
+                <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+              </div>
+            </div>
+            <div style="font-weight: 700; font-size: 0.85rem; color: var(--primary);">1.0x</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           TAB 5: INTERACTIVE 3D FLASHCARDS
+           ========================================================================== -->
+      <section id="flashcards-view" class="view-pane">
+        <div class="hero-banner">
+          <div>
+            <h1 class="hero-title">3D Interactive Flashcards 🎴</h1>
+            <p class="hero-subtitle">Master key formulas, terms, and concepts using spaced repetition techniques.</p>
+          </div>
+          <button class="btn btn-secondary" onclick="openAddCardModal()">+ Add New Card</button>
+        </div>
+
+        <div class="flashcard-wrapper">
+          <div class="flashcard" id="current-flashcard" onclick="flipCard()">
+            <!-- Front Face -->
+            <div class="card-face">
+              <span class="card-category-tag" id="card-subject-tag">Physics</span>
+              <h3 style="font-size: 1.4rem; font-weight: 700;" id="card-question-text">What is Heisenberg's Uncertainty Principle?</h3>
+              <div class="card-prompt-hint">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+                Click to reveal answer
+              </div>
+            </div>
+            <!-- Back Face -->
+            <div class="card-face card-face-back">
+              <span class="card-category-tag" style="background: rgba(16,185,129,0.15); color: var(--success);">Answer</span>
+              <p style="font-size: 1.1rem; line-height: 1.6; font-weight: 500;" id="card-answer-text">
+                It states that position and momentum cannot be measured precisely simultaneously: Δx · Δp ≥ ℏ/2.
+              </p>
+              <div class="card-prompt-hint">Click to flip back</div>
+            </div>
+          </div>
+
+          <!-- Controls -->
+          <div class="flashcard-controls">
+            <button class="btn btn-secondary" onclick="prevCard()">← Prev</button>
+            <button class="btn btn-primary" style="background: var(--danger);" onclick="markCardMastery(false)">Review Later</button>
+            <button class="btn btn-primary" style="background: var(--success);" onclick="markCardMastery(true)">Got It! (+20 XP)</button>
+            <button class="btn btn-secondary" onclick="nextCard()">Next →</button>
+          </div>
+          <div style="text-align: center; margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);" id="card-counter">
+            Card 1 of 5
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           TAB 6: SMART QUIZ ARENA
+           ========================================================================== -->
+      <section id="quiz-view" class="view-pane">
+        <div class="quiz-container" id="quiz-box">
+          <div class="quiz-header">
+            <div>
+              <span style="font-size: 0.78rem; font-weight: 700; color: var(--primary); text-transform: uppercase;">Active Topic Quiz</span>
+              <h2 style="font-size: 1.3rem; font-weight: 700;" id="quiz-topic-title">Physics: Electromagnetism & Waves</h2>
+            </div>
+            <div class="quiz-timer">
+              ⏱️ <span id="quiz-timer-display">00:45</span>
+            </div>
+          </div>
+
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;" id="quiz-question-number">Question 1 of 3</div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem;" id="quiz-question-text">
+            Which law states that induced electromotive force (EMF) is proportional to the rate of change of magnetic flux?
+          </h3>
+
+          <div class="quiz-options-list" id="quiz-options-container">
+            <!-- Options dynamically rendered by JS -->
+          </div>
+
+          <div class="explanation-box" id="explanation-box">
+            <strong>AI Explanation:</strong> <span id="explanation-text">Faraday's Law of Induction states that a change in magnetic environment of a coil of wire causes a voltage (EMF) to be induced in the coil.</span>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
+            <button class="btn btn-primary" id="next-quiz-btn" onclick="submitQuizAnswer()">Submit Answer</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           TAB 7: STUDY PLANNER & POMODORO TIMER
+           ========================================================================== -->
+      <section id="planner-view" class="view-pane">
+        <div class="planner-layout">
+          <!-- Weekly Schedule -->
+          <div>
+            <div class="hero-banner" style="margin-bottom: 1rem;">
+              <div>
+                <h1 class="hero-title">Study Schedule & Tasks 📅</h1>
+                <p class="hero-subtitle">AI-optimized weekly study plan based on upcoming exam dates.</p>
+              </div>
+            </div>
+
+            <div class="schedule-grid">
+              <div class="schedule-day">
+                <div class="day-header">Mon</div>
+                <div class="event-chip" style="background: var(--primary);">Physics 2h</div>
+              </div>
+              <div class="schedule-day">
+                <div class="day-header">Tue</div>
+                <div class="event-chip" style="background: var(--secondary);">CS Algo 1.5h</div>
+              </div>
+              <div class="schedule-day">
+                <div class="day-header">Wed</div>
+                <div class="event-chip" style="background: var(--accent);">Bio Lab 2h</div>
+              </div>
+              <div class="schedule-day">
+                <div class="day-header">Thu</div>
+                <div class="event-chip" style="background: var(--warning);">Math Quiz 1h</div>
+              </div>
+              <div class="schedule-day">
+                <div class="day-header">Fri</div>
+                <div class="event-chip" style="background: var(--success);">History 2h</div>
+              </div>
+              <div class="schedule-day">
+                <div class="day-header">Sat</div>
+                <div class="event-chip" style="background: var(--danger);">Exam Prep 3h</div>
+              </div>
+              <div class="schedule-day">
+                <div class="day-header">Sun</div>
+                <div class="event-chip" style="background: #64748b;">Rest & Review</div>
+              </div>
+            </div>
+
+            <!-- Task Checklist -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.25rem; margin-top: 1.25rem;">
+              <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.75rem;">Today's Study Checklist</h3>
+              <div class="task-checklist">
+                <label class="task-item">
+                  <input type="checkbox" checked onchange="toggleTask(this)">
+                  <span>Read Physics Chapter 4 notes & outline key terms</span>
+                </label>
+                <label class="task-item">
+                  <input type="checkbox" onchange="toggleTask(this)">
+                  <span>Complete 10 3D Flashcards on Quantum Physics</span>
+                </label>
+                <label class="task-item">
+                  <input type="checkbox" onchange="toggleTask(this)">
+                  <span>Finish 25-minute Pomodoro focus session</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pomodoro Widget -->
+          <div>
+            <div class="pomodoro-card">
+              <h3 style="font-size: 1.1rem; font-weight: 700;">Pomodoro Focus Timer ⏱️</h3>
+              <p style="font-size: 0.82rem; color: var(--text-muted);">Stay in the flow zone with timed study intervals.</p>
+              
+              <div class="timer-display" id="pomodoro-timer">25:00</div>
+
+              <div style="display: flex; justify-content: center; gap: 0.75rem;">
+                <button class="btn btn-primary" id="pomo-start-btn" onclick="togglePomodoro()">Start Focus</button>
+                <button class="btn btn-secondary" onclick="resetPomodoro()">Reset</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==========================================================================
+       JAVASCRIPT APPLICATION LOGIC
+       ========================================================================== -->
+  <script>
+    /* ==========================================================================
+       STATE MANAGEMENT
+       ========================================================================== */
+    const appState = {
+      theme: 'dark',
+      activeSubject: 'Physics',
+      userXP: 2450,
+      activeTab: 'chat',
+      // Flashcard data
+      flashcards: [
+        { subject: 'Physics', question: "What is Heisenberg's Uncertainty Principle?", answer: "It states that position and momentum cannot be measured precisely simultaneously: Δx · Δp ≥ ℏ/2." },
+        { subject: 'Physics', question: "Define Faraday's Law of Electromagnetic Induction.", answer: "The induced electromotive force in any closed circuit is equal to the negative rate of change of magnetic flux." },
+        { subject: 'Computer Science', question: "What is the time complexity of QuickSort average case?", answer: "O(n log n). In worst-case (already sorted array with poor pivot), it is O(n²)." },
+        { subject: 'Biology', question: "What is the main function of Mitochondria in eukaryotic cells?", answer: "It generates most of the chemical energy (ATP) needed to power the cell's biochemical reactions." },
+        { subject: 'Mathematics', question: "What is Euler's Identity formula?", answer: "e^(iπ) + 1 = 0, connecting five fundamental mathematical constants." }
+      ],
+      currentCardIndex: 0,
+      // Quiz Data
+      quizQuestions: [
+        {
+          question: "Which law states that induced EMF is proportional to the rate of change of magnetic flux?",
+          options: ["Faraday's Law", "Newton's Second Law", "Ohm's Law", "Kepler's Law"],
+          correctIndex: 0,
+          explanation: "Faraday's Law of Induction states that a change in magnetic flux through a loop induces an electromotive force (EMF)."
+        },
+        {
+          question: "What is the time complexity of searching an element in a balanced Binary Search Tree (BST)?",
+          options: ["O(1)", "O(n)", "O(log n)", "O(n²)"],
+          correctIndex: 2,
+          explanation: "In a balanced BST, each comparison reduces the search space by half, giving logarithmic time complexity O(log n)."
+        },
+        {
+          question: "Which molecule serves as the primary energy currency of biological cells?",
+          options: ["DNA", "ATP (Adenosine Triphosphate)", "Glucose", "RNA"],
+          correctIndex: 1,
+          explanation: "ATP stores chemical energy in high-energy phosphate bonds, releasing it to power cellular work."
+        }
+      ],
+      currentQuizIndex: 0,
+      quizScore: 0,
+      quizSelectedOption: null,
+
+      // Pomodoro Timer State
+      pomodoroTime: 25 * 60,
+      pomodoroInterval: null,
+      pomodoroRunning: false
+    };
+
+    /* ==========================================================================
+       INITIALIZATION
+       ========================================================================== */
+    document.addEventListener('DOMContentLoaded', () => {
+      renderSubjectsGrid();
+      loadFlashcard(0);
+      loadQuizQuestion(0);
+    });
+
+    /* ==========================================================================
+       THEME TOGGLE
+       ========================================================================== */
+    function toggleTheme() {
+      appState.theme = appState.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', appState.theme);
+      const themeBtn = document.getElementById('theme-btn');
+      if (appState.theme === 'light') {
+        themeBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+      } else {
+        themeBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
+      }
+    }
+
+    /* ==========================================================================
+       TAB SWITCHER
+       ========================================================================== */
+    function switchTab(tabId, element) {
+      appState.activeTab = tabId;
+      document.querySelectorAll('.view-pane').forEach(pane => pane.classList.remove('active'));
+      const activePane = document.getElementById(`${tabId}-view`);
+      if (activePane) activePane.classList.add('active');
+
+      if (element) {
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        element.classList.add('active');
+      }
+    }
+
+    /* ==========================================================================
+       SUBJECT SWITCHER
+       ========================================================================== */
+    function onSubjectChange(val) {
+      appState.activeSubject = val;
+      document.getElementById('summary-subject-title').innerText = `${val} - Unit Summary & Key Terms`;
+    }
+
+    function renderSubjectsGrid() {
+      const subjects = [
+        { name: 'Physics', icon: '⚛️', progress: 75, topics: 'Quantum Mechanics, Electromagnetism', color: '#6366f1' },
+        { name: 'Computer Science', icon: '💻', progress: 90, topics: 'Data Structures, Algorithms', color: '#8b5cf6' },
+        { name: 'Biology', icon: '🧬', progress: 60, topics: 'Cellular Respiration, Genetics', color: '#10b981' },
+        { name: 'Mathematics', icon: '📐', progress: 45, topics: 'Calculus III, Linear Algebra', color: '#06b6d4' },
+        { name: 'World History', icon: '📜', progress: 80, topics: 'Industrial Revolution, Cold War', color: '#f59e0b' },
+        { name: 'Chemistry', icon: '🧪', progress: 55, topics: 'Thermodynamics, Organic Synthesis', color: '#ef4444' }
+      ];
+
+      const container = document.getElementById('subjects-grid');
+      container.innerHTML = subjects.map(s => `
+        <div class="subject-card">
+          <div class="subject-icon" style="background: ${s.color}20; color: ${s.color}; font-size: 1.5rem;">${s.icon}</div>
+          <h3 class="subject-title">${s.name}</h3>
+          <div class="subject-meta">${s.topics}</div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" style="width: ${s.progress}%; background: ${s.color};"></div>
+          </div>
+          <div class="progress-text">
+            <span>Progress</span>
+            <span>${s.progress}%</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    /* ==========================================================================
+       PROMPT INSERTER FOR CHAT ASSISTANT
+       ========================================================================== */
+    function insertPrompt(text) {
+      switchTab('chat');
+      // If Watson chat has loaded an input element in #root, attempt to write to it
+      const watsonInput = document.querySelector('#root input, #root textarea');
+      if (watsonInput) {
+        watsonInput.value = text;
+        watsonInput.focus();
+      } else {
+        alert(`Prompt copied: "${text}". Paste into Watson AI Chat once ready!`);
+      }
+    }
+
+    function clearChat() {
+      const rootEl = document.getElementById('root');
+      if (rootEl) {
+        rootEl.innerHTML = `
+          <div class="watson-loader-fallback" id="watson-fallback">
+            <div class="pulse-loader"></div>
+            <h3 style="font-size: 1.1rem; font-weight: 700;">Chat Cleared / Re-initializing Watson AI...</h3>
+            <p style="color: var(--text-muted); font-size: 0.88rem;">Reconnecting to Watson Orchestrate session.</p>
+          </div>
+        `;
+        if (window.wxoLoader && typeof window.wxoLoader.init === 'function') {
+          window.wxoLoader.init();
+        }
+      }
+    }
+
+    /* ==========================================================================
+       FILE UPLOAD SIMULATOR
+       ========================================================================== */
+    function handleFileSelect(e) {
+      if (e.target.files && e.target.files[0]) {
+        processUploadedFile(e.target.files[0].name);
+      }
+    }
+
+    function handleFileDrop(e) {
+      e.preventDefault();
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        processUploadedFile(e.dataTransfer.files[0].name);
+      }
+    }
+
+    function processUploadedFile(filename) {
+      document.getElementById('analyzed-filename').innerText = filename;
+      const resultCard = document.getElementById('analysis-result');
+      resultCard.style.display = 'block';
+      resultCard.scrollIntoView({ behavior: 'smooth' });
+      addXP(50);
+    }
+
+    /* ==========================================================================
+       AI SUMMARIES VIEWS
+       ========================================================================== */
+    function switchSummaryView(viewType, btn) {
+      document.querySelectorAll('.tab-group .tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      document.getElementById('summary-bullets-content').style.display = viewType === 'bullets' ? 'block' : 'none';
+      document.getElementById('summary-mindmap-content').style.display = viewType === 'mindmap' ? 'flex' : 'none';
+      document.getElementById('summary-audio-content').style.display = viewType === 'audio' ? 'block' : 'none';
+    }
+
+    let isAudioPlaying = false;
+    function toggleAudioReader() {
+      isAudioPlaying = !isAudioPlaying;
+      const waveform = document.getElementById('waveform');
+      const playIcon = document.getElementById('play-icon');
+      const statusText = document.getElementById('audio-status');
+
+      if (isAudioPlaying) {
+        waveform.classList.remove('audio-paused');
+        waveform.classList.add('audio-playing');
+        playIcon.innerHTML = `<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>`;
+        statusText.innerText = "Playing AI Audio Summary...";
+      } else {
+        waveform.classList.remove('audio-playing');
+        waveform.classList.add('audio-paused');
+        playIcon.innerHTML = `<polygon points="5 3 19 12 5 21 5 3"/>`;
+        statusText.innerText = "Paused audio";
+      }
+    }
+
+    function copySummaryText() {
+      navigator.clipboard.writeText("Quantum Physics Takeaways: Wave-Particle Duality, Schrödinger Equation, Heisenberg Uncertainty Principle.");
+      alert("Summary copied to clipboard!");
+    }
+
+    /* ==========================================================================
+       3D FLASHCARDS LOGIC
+       ========================================================================== */
+    function flipCard() {
+      document.getElementById('current-flashcard').classList.toggle('flipped');
+    }
+
+    function loadFlashcard(index) {
+      const card = appState.flashcards[index];
+      document.getElementById('card-subject-tag').innerText = card.subject;
+      document.getElementById('card-question-text').innerText = card.question;
+      document.getElementById('card-answer-text').innerText = card.answer;
+      document.getElementById('card-counter').innerText = `Card ${index + 1} of ${appState.flashcards.length}`;
+      document.getElementById('current-flashcard').classList.remove('flipped');
+    }
+
+    function nextCard() {
+      appState.currentCardIndex = (appState.currentCardIndex + 1) % appState.flashcards.length;
+      loadFlashcard(appState.currentCardIndex);
+    }
+
+    function prevCard() {
+      appState.currentCardIndex = (appState.currentCardIndex - 1 + appState.flashcards.length) % appState.flashcards.length;
+      loadFlashcard(appState.currentCardIndex);
+    }
+
+    function markCardMastery(mastered) {
+      if (mastered) {
+        addXP(20);
+      }
+      nextCard();
+    }
+
+    function openAddCardModal() {
+      const question = prompt("Enter Flashcard Question:");
+      if (!question) return;
+      const answer = prompt("Enter Flashcard Answer:");
+      if (!answer) return;
+
+      appState.flashcards.push({
+        subject: appState.activeSubject,
+        question: question,
+        answer: answer
+      });
+
+      appState.currentCardIndex = appState.flashcards.length - 1;
+      loadFlashcard(appState.currentCardIndex);
+    }
+
+    /* ==========================================================================
+       SMART QUIZ ARENA LOGIC
+       ========================================================================== */
+    function loadQuizQuestion(index) {
+      const q = appState.quizQuestions[index];
+      appState.quizSelectedOption = null;
+      document.getElementById('quiz-question-number').innerText = `Question ${index + 1} of ${appState.quizQuestions.length}`;
+      document.getElementById('quiz-question-text').innerText = q.question;
+
+      const container = document.getElementById('quiz-options-container');
+      const letters = ['A', 'B', 'C', 'D'];
+      container.innerHTML = q.options.map((opt, i) => `
+        <div class="quiz-option" onclick="selectQuizOption(${i}, this)">
+          <div class="option-prefix">${letters[i]}</div>
+          <span>${opt}</span>
+        </div>
+      `).join('');
+
+      document.getElementById('explanation-box').style.display = 'none';
+      document.getElementById('next-quiz-btn').innerText = "Submit Answer";
+    }
+
+    function selectQuizOption(optionIndex, el) {
+      document.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('selected'));
+      el.classList.add('selected');
+      appState.quizSelectedOption = optionIndex;
+    }
+
+    function submitQuizAnswer() {
+      if (appState.quizSelectedOption === null) {
+        alert("Please select an answer first!");
+        return;
+      }
+
+      const q = appState.quizQuestions[appState.currentQuizIndex];
+      const options = document.querySelectorAll('.quiz-option');
+
+      options.forEach((opt, i) => {
+        if (i === q.correctIndex) {
+          opt.classList.add('correct');
+        } else if (i === appState.quizSelectedOption) {
+          opt.classList.add('incorrect');
+        }
+      });
+
+      document.getElementById('explanation-text').innerText = q.explanation;
+      document.getElementById('explanation-box').style.display = 'block';
+
+      if (appState.quizSelectedOption === q.correctIndex) {
+        addXP(50);
+      }
+
+      const nextBtn = document.getElementById('next-quiz-btn');
+      nextBtn.innerText = "Next Question →";
+      nextBtn.onclick = () => {
+        appState.currentQuizIndex = (appState.currentQuizIndex + 1) % appState.quizQuestions.length;
+        loadQuizQuestion(appState.currentQuizIndex);
+        nextBtn.onclick = submitQuizAnswer;
+      };
+    }
+
+    /* ==========================================================================
+       POMODORO TIMER LOGIC
+       ========================================================================== */
+    function togglePomodoro() {
+      const btn = document.getElementById('pomo-start-btn');
+      if (appState.pomodoroRunning) {
+        clearInterval(appState.pomodoroInterval);
+        appState.pomodoroRunning = false;
+        btn.innerText = "Resume";
+      } else {
+        appState.pomodoroRunning = true;
+        btn.innerText = "Pause";
+        appState.pomodoroInterval = setInterval(() => {
+          if (appState.pomodoroTime > 0) {
+            appState.pomodoroTime--;
+            updatePomodoroDisplay();
+          } else {
+            clearInterval(appState.pomodoroInterval);
+            appState.pomodoroRunning = false;
+            btn.innerText = "Start Focus";
+            alert("🎉 Pomodoro Focus Session Complete! +100 XP Earned");
+            addXP(100);
+          }
+        }, 1000);
+      }
+    }
+
+    function resetPomodoro() {
+      clearInterval(appState.pomodoroInterval);
+      appState.pomodoroRunning = false;
+      appState.pomodoroTime = 25 * 60;
+      document.getElementById('pomo-start-btn').innerText = "Start Focus";
+      updatePomodoroDisplay();
+    }
+
+    function updatePomodoroDisplay() {
+      const mins = Math.floor(appState.pomodoroTime / 60);
+      const secs = appState.pomodoroTime % 60;
+      document.getElementById('pomodoro-timer').innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function toggleTask(checkbox) {
+      checkbox.parentElement.classList.toggle('completed', checkbox.checked);
+      if (checkbox.checked) addXP(15);
+    }
+
+    /* ==========================================================================
+       XP GAMIFICATION LOGIC
+       ========================================================================== */
+    function addXP(amount) {
+      appState.userXP += amount;
+      document.getElementById('xp-counter').innerText = `${appState.userXP.toLocaleString()} XP`;
+    }
+  </script>
+</body>
+</html>
