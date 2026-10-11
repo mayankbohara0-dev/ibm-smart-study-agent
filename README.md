@@ -6,7 +6,7 @@
 
 - AI assistant area for questions, explanations, and quick prompts.
 - Subject hub with progress indicators and learning statistics.
-- Notes and files drop zone with analysis-result presentation.
+- Notes and a file-drop demo that displays selected filenames; it does not upload or analyze file contents.
 - AI summary views with mind-map and audio-player modes.
 - Flip-based flashcards, timed quizzes, explanations, and answer states.
 - Weekly planner, checklist, Pomodoro-style timer, streaks, XP, and theme toggle.
@@ -32,7 +32,7 @@ Open [http://localhost:8000](http://localhost:8000). Opening `index.html` direct
 
 ## Configuration and scope
 
-The Watsonx configuration is embedded in `index.html`. Before deploying publicly, confirm that the referenced deployment is intended to be public and that its access policy is appropriate. Many study values and interactions are demonstration data; a production version would add a secured backend, persistent progress, server-side file validation, accessibility coverage, and automated browser tests.
+The Watsonx configuration is embedded in `index.html`. Before deploying publicly, confirm that the referenced deployment is intended to be public and that its access policy is appropriate. Many study values and interactions are demonstration data. Files dropped into the UI remain a filename-only demo; no file contents are uploaded or analyzed. A production version would need a secured backend, persistent progress, server-side file validation, accessibility coverage, and automated browser tests.
 
 ## Author
 

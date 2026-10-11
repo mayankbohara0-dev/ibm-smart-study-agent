@@ -1,0 +1,28 @@
+name: Static checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Validate HTML, inline JavaScript, and local links
+        run: python3 .github/scripts/validate_static.py
+      - name: Smoke-test local HTTP serving
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 > "$RUNNER_TEMP/http.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 10); do
+            if curl --fail --silent http://127.0.0.1:8000/ >/dev/null; then break; fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:8000/ >/dev/null
